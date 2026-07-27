@@ -1,0 +1,107 @@
+---
+description: Nabhi site — design system, content and code rules. Always apply.
+alwaysApply: true
+---
+
+# Nabhi — project rules
+
+Nabhi builds AI products, software and custom systems. The site's thesis is that
+understanding comes before technology. Everything below follows from that.
+
+## The one idea
+
+The whole site sits inside **one continuous sunrise** — night at the top of the page,
+morning at the bottom. `Atmosphere.tsx` interpolates three CSS custom properties from
+scroll progress: `--bg`, `--ink`, `--amber`.
+
+- **Never hardcode a colour.** Use `var(--ink)`, `var(--bg)`, `var(--amber)`, or a
+  `color-mix()` of them.
+- **Never use a Tailwind colour utility** — no `text-white`, `bg-black`, `text-gray-500`,
+  `border-neutral-800`.
+- Colour stops live in `src/lib/color.ts`. That file is the only place a hex belongs.
+- Needing a new colour means the problem is being solved wrong.
+
+## Structure
+
+The site is a conversation, not a sitemap. Ten chapters, each answering exactly one
+question a visitor is already asking, in the order they ask it.
+
+- Every chapter opens: **number → name → question → answer**. Never vary this.
+- Chapter 01 is the sole exception — it doesn't print its question.
+- There is no `/about`, no `/contact`, no `/work` index. Chapters 08, 09 and 06 are those
+  pages. Do not create them.
+- Do not add a section that doesn't answer a visitor question.
+
+## Motion
+
+- One reveal primitive: `ui/Reveal.tsx`. Do not create a second.
+- Easing `cubic-bezier(0.16, 1, 0.3, 1)` or `power3.out`. Nothing bounces, springs or overshoots.
+- Reveal duration ≥ 1.2s. If it feels slow alone it's usually right in context.
+- Everything is scroll-linked or once-only. Only grain, ripples and the breathing dot loop.
+- Every animation must survive the question *does this help someone understand?* Motion
+  that only delights gets cut.
+- `prefers-reduced-motion` is honoured everywhere, not bolted on.
+
+## Typography
+
+| Role | Variable | Use |
+| --- | --- | --- |
+| Display | `--font-serif` | statements, visitor questions (italic) |
+| Body | `--font-sans` weight 300 only | prose |
+| Structure | `--font-mono` | chapter numbers, labels, CTAs, metadata |
+
+Measure never exceeds 38ch. Existing classes — `.display`, `.display-sm`, `.question`,
+`.lede`, `.label` — are the type scale. Extend them rather than writing one-off sizes.
+
+## Imagery
+
+Abstraction in the dark, literalness in the light. Four image moments in ten chapters:
+product UI (Ch03), project screens (Ch06), founder photography (Ch08), the vista (Ch10).
+
+Three permitted sources, no others:
+
+1. **Product truth** — real interfaces, flat on the page, no mockups or perspective tilt
+2. **Documentary human** — real people, real light, unposed, grainy
+3. **Generative** — computed from something real, never decorative
+
+**Forbidden:** 3D gradient blobs, glowing neural meshes, wireframe brains, abstract AI
+orbs, floating device mockups, stock photography, any image of a person looking at a screen.
+
+## Content
+
+- **Never invent facts** about the five projects, the founders, or Second Brain.
+- **Never invent a metric.** If a number isn't supplied, leave it out and flag it.
+- Missing content renders as a visible `.placeholder` box stating exactly what's needed.
+- Never name a technology before naming a capability. *"We build systems that remember"*
+  comes before any mention of retrieval. The one exception is `/second-brain` part 04.
+- The first sentence after a chapter question must answer that question. No throat-clearing.
+
+**Banned words:** cutting-edge, leverage, solutions, seamless, empower, revolutionise,
+transform (as a verb), unlock, supercharge, best-in-class, game-changing, robust.
+
+## Components never to add
+
+A second accent colour · card grids · testimonial carousels · logo clouds · animated stat
+counters · pricing tables · chat bubbles · cookie banners · newsletter modals.
+
+## Code
+
+- Next.js 15 App Router, TypeScript strict, Tailwind, Framer Motion, Lenis.
+- Server components by default. `"use client"` only for scroll, state or effects.
+- No new dependency without explaining why the existing stack can't do it.
+- Content lives in typed files under `src/content`. No CMS until a non-developer needs to publish.
+- Run `npx tsc --noEmit` and `npm run build` before declaring anything finished.
+
+## Accessibility
+
+- Contrast must clear 4.5:1 at **every** scroll position, not just at the colour stops.
+  Interpolated colour makes this easy to get wrong — verify by sampling, not by eye.
+- Decorative canvases and the chapter indicator are `aria-hidden`; meaning lives in adjacent text.
+- Real `<label>` elements, visible amber focus states, skip-to-content link.
+
+## The north star
+
+> Does this make the world a little easier to understand?
+
+Apply it literally, to every chapter, image, animation and line of copy. If the answer is
+no, it doesn't ship.
