@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import Wordmark from "@/components/brand/Wordmark";
+import { recomputeSpatial } from "@/components/spatial/Act";
 
 /** Home chapter anchors — prefixed so nav works from every route. */
 const links = [
@@ -10,6 +11,16 @@ const links = [
   { href: "/#proof", label: "Proof" },
   { href: "/#begin", label: "Begin" },
 ];
+
+function afterAnchorScroll() {
+  // Native scroll may still be settling — refresh act light ownership
+  recomputeSpatial();
+  requestAnimationFrame(() => {
+    recomputeSpatial();
+    window.setTimeout(recomputeSpatial, 120);
+    window.setTimeout(recomputeSpatial, 400);
+  });
+}
 
 export default function Nav() {
   const reduce = useReducedMotion();
@@ -29,6 +40,9 @@ export default function Nav() {
           <a
             key={l.href}
             href={l.href}
+            onClick={() => {
+              if (l.href.includes("#")) afterAnchorScroll();
+            }}
             className={`font-mono text-[11px] uppercase tracking-[0.18em] opacity-[0.65] transition-opacity duration-500 hover:opacity-100 ${
               i < links.length - 1 ? "hidden md:inline" : ""
             }`}

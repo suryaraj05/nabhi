@@ -12,7 +12,7 @@ type Props = {
 
 /**
  * A real product screenshot, flat on the page.
- * No mockup, no tilt, no shadow — just the interface, as it is.
+ * No mockup, no tilt — directional .lit-frame shadow only (from the door).
  */
 export default function ProductFrame({
   src,
@@ -41,7 +41,7 @@ export default function ProductFrame({
 
   return (
     <div
-      className={className}
+      className={`lit-frame ${className}`}
       style={{
         width: "100%",
         border: "1px solid color-mix(in srgb, var(--ink) 12%, transparent)",

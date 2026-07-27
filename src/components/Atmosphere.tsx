@@ -27,19 +27,27 @@ function applyLight(root: HTMLElement, mp: number, refs: {
   root.style.setProperty("--ink", css(inkAt(mp)));
   root.style.setProperty("--amber", css(amberAt(mp)));
 
-  const sunT = clamp01((mp - 0.42) / 0.48);
+  // Soft ambient bloom — dims as the door becomes the primary light source.
+  // Door owns --door-scale; Atmosphere only reads it.
+  const doorScale = parseFloat(root.style.getPropertyValue("--door-scale") || "4");
+  const doorDominance = clamp01((doorScale - 4) / 50);
+  const sunT = clamp01((mp - 0.42) / 0.48) * (1 - doorDominance * 0.85);
   if (refs.sun) {
-    refs.sun.style.opacity = String(sunT * 0.95);
-    refs.sun.style.transform = `translate(-50%, ${48 - sunT * 78}vh)`;
+    refs.sun.style.opacity = String(sunT * 0.55);
+    refs.sun.style.transform = `translate3d(-50%, ${48 - sunT * 78}vh, 0)`;
   }
 
-  const hT = clamp01((mp - 0.34) / 0.2) * (1 - clamp01((mp - 0.72) / 0.18));
+  const hT =
+    clamp01((mp - 0.34) / 0.2) *
+    (1 - clamp01((mp - 0.72) / 0.18)) *
+    (1 - doorDominance);
   if (refs.horizon) refs.horizon.style.opacity = String(hT);
 }
 
 /**
  * The whole site sits inside one continuous sunrise.
- * Nothing here is decoration — the light is the narrative.
+ * Owns --bg, --ink, --amber from page progress.
+ * Spatial vars (--light-angle, --light-strength, --door-scale) are owned by Act.
  */
 export default function Atmosphere({
   progressStart = 0,
@@ -81,7 +89,7 @@ export default function Atmosphere({
         style={{
           width: "150vmax",
           height: "150vmax",
-          transform: "translate(-50%, 48vh)",
+          transform: "translate3d(-50%, 48vh, 0)",
           background:
             "radial-gradient(circle at 50% 50%, rgba(255,214,164,.55) 0%, rgba(233,183,124,.28) 18%, rgba(180,120,110,.12) 34%, rgba(0,0,0,0) 62%)",
         }}

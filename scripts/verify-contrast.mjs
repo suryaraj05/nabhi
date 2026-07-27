@@ -1,6 +1,6 @@
 /**
- * Samples bg/ink (and muted text stops) at 100 scroll points.
- * Fails if any contrast ratio drops below 4.5:1.
+ * Samples bg/ink (and muted text) at 100 scroll points, including door-glow
+ * contribution behind text. Fails if any contrast drops below 4.5:1.
  *
  * Run: npm run verify:contrast
  */
@@ -22,6 +22,17 @@ const INK_DARK = [242, 237, 228];
 const INK_LIGHT = [28, 26, 23];
 const MIN_RATIO = 4.5;
 const SAMPLES = 100;
+
+/** Mirror of acts.ts end-values across page progress (Act V deliberately longer). */
+const SPATIAL = [
+  { p: 0.0, doorScale: 2.5, lightStrength: 0.08 },
+  { p: 0.16, doorScale: 4, lightStrength: 0.15 },
+  { p: 0.28, doorScale: 8, lightStrength: 0.35 },
+  { p: 0.38, doorScale: 16, lightStrength: 0.4 },
+  { p: 0.48, doorScale: 34, lightStrength: 0.65 },
+  { p: 0.72, doorScale: 62, lightStrength: 0.95 },
+  { p: 1.0, doorScale: 120, lightStrength: 1 },
+];
 
 const lerp = (a, b, t) => a + (b - a) * t;
 const clamp01 = (n) => Math.min(1, Math.max(0, n));
@@ -49,6 +60,22 @@ function mix(a, b, t) {
     Math.round(lerp(a[1], b[1], t)),
     Math.round(lerp(a[2], b[2], t)),
   ];
+}
+
+function spatialAt(p) {
+  if (p <= SPATIAL[0].p) return SPATIAL[0];
+  for (let i = 0; i < SPATIAL.length - 1; i++) {
+    const a = SPATIAL[i];
+    const b = SPATIAL[i + 1];
+    if (p >= a.p && p <= b.p) {
+      const t = (p - a.p) / (b.p - a.p);
+      return {
+        doorScale: lerp(a.doorScale, b.doorScale, t),
+        lightStrength: lerp(a.lightStrength, b.lightStrength, t),
+      };
+    }
+  }
+  return SPATIAL[SPATIAL.length - 1];
 }
 
 function luminance([r, g, b]) {
@@ -85,9 +112,22 @@ function amberAt(p) {
   return rgbAt(AMBER, p);
 }
 
-/** color-mix(ink X%, transparent) over solid bg */
 function mutedInk(ink, bg, inkPercent) {
   return mix(ink, bg, 1 - inkPercent / 100);
+}
+
+/**
+ * Effective background when text sits over the door centre.
+ * Glow alpha capped at 0.30 through Acts I–V; lifts only after threshold.
+ */
+function bgWithDoorGlow(bg, amber, p) {
+  const { doorScale, lightStrength } = spatialAt(p);
+  const thresholdT = clamp01((doorScale - 62) / 50);
+  const glowCap = thresholdT > 0.25 ? 0.35 : 0.1;
+  // Door opacity is (1 - threshold-t); glow gone once the arch has opened
+  const doorPresence = clamp01(1 - thresholdT / 0.35);
+  const mixAmt = glowCap * doorPresence;
+  return mix(bg, amber, mixAmt);
 }
 
 const checks = [
@@ -100,37 +140,37 @@ const checks = [
 
 let worst = { ratio: Infinity, p: 0, check: "" };
 
+function consider(ratio, p, check) {
+  if (ratio < worst.ratio) worst = { ratio, p, check };
+}
+
 for (let i = 0; i <= SAMPLES; i++) {
   const p = i / SAMPLES;
   const bg = rgbAt(SKY, p);
   const ink = inkAt(p);
   const amber = amberAt(p);
+  const doorBg = bgWithDoorGlow(bg, amber, p);
 
   for (const { name, inkPct } of checks) {
     const fg = mutedInk(ink, bg, inkPct);
-    const ratio = contrast(fg, bg);
-    if (ratio < worst.ratio) worst = { ratio, p, check: name };
+    consider(contrast(fg, bg), p, name);
+    // Text over door glow (worst-case mid-corridor)
+    const fgDoor = mutedInk(ink, doorBg, inkPct);
+    consider(contrast(fgDoor, doorBg), p, `${name} + door glow`);
   }
 
-  const amberRatio = contrast(amber, bg);
-  if (amberRatio < worst.ratio) {
-    worst = { ratio: amberRatio, p, check: ".accent (--amber)" };
-  }
-
-  // Inverted CTA: --bg text on --ink background
-  const ctaRatio = contrast(bg, ink);
-  if (ctaRatio < worst.ratio) {
-    worst = { ratio: ctaRatio, p, check: ".cta-primary (bg on ink)" };
-  }
+  consider(contrast(amber, bg), p, ".accent (--amber)");
+  consider(contrast(amber, doorBg), p, ".accent + door glow");
+  consider(contrast(bg, ink), p, ".cta-primary (bg on ink)");
 }
 
-console.log(`Contrast audit (${SAMPLES + 1} samples, minimum required ${MIN_RATIO}:1)`);
+console.log(`Contrast audit (${SAMPLES + 1} samples, incl. door glow, min ${MIN_RATIO}:1)`);
 console.log(
   `Worst: ${worst.ratio.toFixed(2)}:1 at progress ${worst.p.toFixed(2)} (${worst.check})`
 );
 
 if (worst.ratio < MIN_RATIO) {
-  console.error("\nFAIL — adjust stops in src/lib/color.ts");
+  console.error("\nFAIL — adjust stops in src/lib/color.ts or lower door glow cap");
   process.exit(1);
 }
 

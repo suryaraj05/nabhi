@@ -105,3 +105,22 @@ counters · pricing tables · chat bubbles · cookie banners · newsletter modal
 
 Apply it literally, to every chapter, image, animation and line of copy. If the answer is
 no, it doesn't ship.
+
+## Spatial rules
+
+The site is a journey along a path toward a distant amber doorway, and finally through it
+into morning above the clouds. Night becomes morning because you are walking toward a door.
+
+- **Scroll is never hijacked.** Vertical wheel input produces vertical scroll, always.
+  Curves are expressed as lateral *drift* of content (±6–9vw), never as horizontal scroll.
+- Six acts contain the ten chapters. Acts are containers, chapters are content. All
+  spatial values live in `src/lib/acts.ts` — never hardcoded in components.
+- The door is CSS/SVG only. No WebGL, no canvas, no video, anywhere in the corridor.
+- The door is a light source, not a lightbox. Interior glow alpha is capped at 0.30 until
+  Act VI so text over it always clears 4.5:1.
+- Directional shadow (`.lit`) applies to display headings and media frames only, never to
+  body copy.
+- `prefers-reduced-motion` disables lateral drift and all parallax. The door may still
+  scale — it is slow and monotonic.
+- Act V (Proof, Why Nabhi) is deliberately slowed. Proof is where a sceptic decides; it is
+  never something the visitor passes at speed.

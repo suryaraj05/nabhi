@@ -1,8 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { actForChapter } from "@/lib/acts";
 
-/** A quiet reminder of where you are in the conversation. */
+/** Format: II · CURVE ONE — 03 Second Brain */
+function formatLabel(chapterEl: HTMLElement): string {
+  const chapterAttr = chapterEl.getAttribute("data-chapter") ?? "";
+  const chapterId = chapterEl.id;
+  const act = actForChapter(chapterId);
+
+  const chapterPart = chapterAttr.replace(" — ", " ");
+  if (!act) return chapterPart;
+
+  return `${act.n} · ${act.name.toUpperCase()} — ${chapterPart}`;
+}
+
+/** A quiet reminder of where you are in the conversation — and which act. */
 export default function ChapterIndicator() {
   const [label, setLabel] = useState("");
 
@@ -15,7 +28,9 @@ export default function ChapterIndicator() {
         const visible = entries
           .filter((e) => e.isIntersecting)
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (visible) setLabel(visible.target.getAttribute("data-chapter") ?? "");
+        if (visible?.target instanceof HTMLElement) {
+          setLabel(formatLabel(visible.target));
+        }
       },
       { rootMargin: "-45% 0px -45% 0px", threshold: [0, 0.01, 0.5, 1] }
     );

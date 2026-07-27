@@ -40,7 +40,7 @@ export default function Portrait({
 
   return (
     <div
-      className={className}
+      className={`lit-frame ${className}`}
       style={{
         position: "relative",
         width: "100%",

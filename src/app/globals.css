@@ -7,6 +7,17 @@
   --ink: #f2ede4;
   --amber: #e9b77c;
   --gut: clamp(24px, 5vw, 96px);
+  /* Spatial corridor — owned by Act.tsx, read by Door / .lit */
+  --light-angle: 0deg;
+  --light-strength: 0.15;
+  --door-scale: 4;
+  --threshold-t: 0;
+  --door-glow-cap: 0.1;
+  /* Shadows longest when far from the door; resolve to nothing in Act V flood */
+  --shadow-dist: calc((1 - var(--light-strength)) * 28px);
+  --shadow-x: calc(sin(var(--light-angle)) * -1 * var(--shadow-dist));
+  --shadow-y: calc(cos(var(--light-angle)) * 0.28 * var(--shadow-dist));
+  --shadow-blur: calc(18px + (1 - var(--light-strength)) * 42px);
 }
 
 @layer base {
@@ -78,6 +89,24 @@
     font-size: clamp(1.9rem, 4.2vw, 3.9rem);
     line-height: 1.14;
     letter-spacing: -0.015em;
+  }
+
+  /*
+   * Directional light from the door.
+   * Apply to display headings and media frames only — never body copy.
+   */
+  .lit,
+  .display,
+  .display-sm {
+    text-shadow:
+      var(--shadow-x) var(--shadow-y) var(--shadow-blur)
+      color-mix(in srgb, var(--bg) calc(25% + (1 - var(--light-strength)) * 45%), transparent);
+  }
+  .lit-frame {
+    box-shadow:
+      var(--shadow-x) var(--shadow-y) var(--shadow-blur)
+      color-mix(in srgb, var(--bg) calc(30% + (1 - var(--light-strength)) * 50%), transparent);
+    transition: box-shadow 120ms linear;
   }
   .lede {
     font-size: clamp(1.02rem, 1.55vw, 1.36rem);
@@ -217,4 +246,92 @@
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .grain, .breathe, .ripple { animation: none; }
+  /* Door may still scale (monotonic); drop will-change + hide expanding mask */
+  .door, .threshold { will-change: auto; }
+  .threshold { display: none; }
+}
+
+/* ---- spatial corridor: the door ---- */
+.door {
+  position: fixed;
+  left: 50%;
+  top: 46%;
+  z-index: 2;
+  width: 0.46vh;
+  height: 1vh;
+  transform: translate3d(-50%, -50%, 0) scale(var(--door-scale));
+  transform-origin: center center;
+  pointer-events: none;
+  will-change: transform;
+  /* Dissolves as Threshold opens (Act VI) */
+  opacity: calc(1 - var(--threshold-t));
+}
+.door__bloom {
+  position: absolute;
+  inset: -120% -180%;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    color-mix(in srgb, var(--amber) calc(var(--light-strength) * 18%), transparent) 0%,
+    color-mix(in srgb, var(--amber) calc(var(--light-strength) * 8%), transparent) 35%,
+    transparent 70%
+  );
+  transform: rotate(var(--light-angle));
+  opacity: calc(0.35 + var(--light-strength) * 0.45);
+}
+.door__arch {
+  position: absolute;
+  inset: 0;
+  border-radius: 50% 50% 0 0 / 30% 30% 0 0;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+}
+.door__glow {
+  position: absolute;
+  inset: 0;
+  /* Cap via --door-glow-cap: ≤0.10 through I–V (under 0.30 ceiling), lifts in VI */
+  background: radial-gradient(
+    ellipse at 50% 58%,
+    color-mix(in srgb, var(--amber) calc(var(--door-glow-cap) * 100%), transparent) 0%,
+    color-mix(in srgb, var(--amber) calc(var(--door-glow-cap) * 55%), transparent) 38%,
+    color-mix(in srgb, var(--amber) calc(var(--door-glow-cap) * 12%), transparent) 68%,
+    transparent 100%
+  );
+  opacity: calc(0.45 + var(--light-strength) * 0.55);
+}
+.door__rim {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--amber) calc(40% + var(--light-strength) * 35%), transparent),
+    0 0 24px color-mix(in srgb, var(--amber) calc(var(--light-strength) * 22%), transparent);
+  pointer-events: none;
+}
+
+/* Act VI — expanding arch silhouette before it passes beyond view */
+.threshold {
+  position: fixed;
+  left: 50%;
+  top: 46%;
+  z-index: 2;
+  width: 0.46vh;
+  height: 1vh;
+  transform-origin: center center;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+.threshold__arch {
+  position: absolute;
+  inset: 0;
+  border-radius: 50% 50% 0 0 / 30% 30% 0 0;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--amber) 55%, transparent),
+    0 0 60px color-mix(in srgb, var(--amber) 25%, transparent);
+  background: radial-gradient(
+    ellipse at 50% 55%,
+    color-mix(in srgb, var(--amber) 40%, transparent) 0%,
+    color-mix(in srgb, var(--bg) 20%, transparent) 70%,
+    transparent 100%
+  );
 }

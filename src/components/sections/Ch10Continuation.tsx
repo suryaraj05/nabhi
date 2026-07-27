@@ -1,5 +1,5 @@
 import Wordmark from "@/components/brand/Wordmark";
-import Vista from "@/components/media/Vista";
+import Horizon from "@/components/spatial/Horizon";
 import Reveal from "@/components/ui/Reveal";
 
 const LINKS = [
@@ -26,8 +26,8 @@ export default function Ch10Continuation() {
         </Reveal>
 
         <Reveal delay={0.08} className="mt-[clamp(48px,9vh,110px)]">
-          {/* Layers omitted until WebP assets arrive — Vista shows gradient + placeholder */}
-          <Vista />
+          {/* Layers omitted until WebP assets arrive — Horizon shows gradient + placeholder */}
+          <Horizon />
         </Reveal>
 
         <div className="mt-[clamp(56px,11vh,140px)] flex flex-wrap items-end justify-between gap-x-12 gap-y-10">
