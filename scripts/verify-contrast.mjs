@@ -25,12 +25,12 @@ const SAMPLES = 100;
 
 /** Mirror of acts.ts end-values across page progress (Act V deliberately longer). */
 const SPATIAL = [
-  { p: 0.0, doorScale: 2.5, lightStrength: 0.08 },
-  { p: 0.16, doorScale: 4, lightStrength: 0.15 },
-  { p: 0.28, doorScale: 8, lightStrength: 0.35 },
-  { p: 0.38, doorScale: 16, lightStrength: 0.4 },
-  { p: 0.48, doorScale: 34, lightStrength: 0.65 },
-  { p: 0.72, doorScale: 62, lightStrength: 0.95 },
+  { p: 0.0, doorScale: 2.2, lightStrength: 0.06 },
+  { p: 0.16, doorScale: 3.5, lightStrength: 0.12 },
+  { p: 0.28, doorScale: 5.5, lightStrength: 0.28 },
+  { p: 0.38, doorScale: 10, lightStrength: 0.38 },
+  { p: 0.48, doorScale: 32, lightStrength: 0.62 },
+  { p: 0.72, doorScale: 72, lightStrength: 0.92 },
   { p: 1.0, doorScale: 120, lightStrength: 1 },
 ];
 
@@ -122,7 +122,7 @@ function mutedInk(ink, bg, inkPercent) {
  */
 function bgWithDoorGlow(bg, amber, p) {
   const { doorScale, lightStrength } = spatialAt(p);
-  const thresholdT = clamp01((doorScale - 62) / 50);
+  const thresholdT = clamp01((doorScale - 72) / 48);
   const glowCap = thresholdT > 0.25 ? 0.35 : 0.1;
   // Door opacity is (1 - threshold-t); glow gone once the arch has opened
   const doorPresence = clamp01(1 - thresholdT / 0.35);

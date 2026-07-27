@@ -24,8 +24,8 @@ export default function Threshold() {
   function sync() {
     const raw = document.documentElement.style.getPropertyValue("--door-scale");
     const door = parseFloat(raw || "4");
-    // Act V ends at 62; Act VI climbs toward 120
-    const t = clamp01((door - 62) / 50);
+    // Act V ends at 72; Act VI climbs toward 120
+    const t = clamp01((door - 72) / 48);
     scale.set(1 + t * 17);
     fade.set(t < 0.5 ? 1 : clamp01(1 - (t - 0.5) / 0.5));
     document.documentElement.style.setProperty("--threshold-t", String(t));

@@ -148,8 +148,8 @@ export default function Horizon({ layers = {}, className = "" }: Props) {
           }}
         >
           Placeholder — Horizon layers required (WebP with alpha, ≤400KB total): sky,
-          far-cloud, near-cloud, ridge, haze. Suggested ~1920×1080 each. No laptop in
-          frame. Figure, if any: small, still.
+          far-cloud, near-cloud, ridge, haze. Morning above a calm sea of cloud — cliff
+          edge optional. Suggested ~1920×1080 each. No laptop. Figure, if any: small, still.
         </div>
       ) : null}
     </div>

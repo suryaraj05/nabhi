@@ -28,8 +28,9 @@ export const ACTS: Act[] = [
     name: "The Threshold",
     motion: "forward",
     lightAngle: 0,
-    lightStrength: 0.15,
-    doorScale: 4,
+    lightStrength: 0.12,
+    // Stay atmospheric — philosophy reads first; door is a distant warmth
+    doorScale: 3.5,
     drift: 0,
     chapters: ["arrival", "philosophy"],
   },
@@ -39,8 +40,8 @@ export const ACTS: Act[] = [
     name: "Curve One",
     motion: "drift-right",
     lightAngle: -45,
-    lightStrength: 0.35,
-    doorScale: 8,
+    lightStrength: 0.28,
+    doorScale: 5.5,
     drift: 7.5,
     chapters: ["second-brain"],
   },
@@ -50,8 +51,8 @@ export const ACTS: Act[] = [
     name: "Curve Two",
     motion: "drift-left",
     lightAngle: 45,
-    lightStrength: 0.4,
-    doorScale: 16,
+    lightStrength: 0.38,
+    doorScale: 10,
     drift: -7.5,
     chapters: ["what-we-build"],
   },
@@ -61,8 +62,9 @@ export const ACTS: Act[] = [
     name: "The Approach",
     motion: "forward",
     lightAngle: 0,
-    lightStrength: 0.65,
-    doorScale: 34,
+    lightStrength: 0.62,
+    // Capability — camera begins to enter the doorway's light
+    doorScale: 32,
     drift: 0,
     chapters: ["intelligence"],
   },
@@ -72,8 +74,9 @@ export const ACTS: Act[] = [
     name: "The Work",
     motion: "forward",
     lightAngle: 0,
-    lightStrength: 0.95,
-    doorScale: 62,
+    lightStrength: 0.92,
+    // Proof fills the frame — warm, almost tangible
+    doorScale: 72,
     drift: 0,
     chapters: ["proof", "why-nabhi"],
   },
@@ -108,7 +111,7 @@ export function actStartValues(index: number): Pick<
   "lightAngle" | "lightStrength" | "doorScale" | "drift"
 > {
   if (index <= 0) {
-    return { lightAngle: 0, lightStrength: 0.08, doorScale: 2.5, drift: 0 };
+    return { lightAngle: 0, lightStrength: 0.06, doorScale: 2.2, drift: 0 };
   }
   const prev = ACTS[index - 1];
   return {

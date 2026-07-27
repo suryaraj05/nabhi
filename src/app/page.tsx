@@ -3,6 +3,7 @@ import JsonLd from "@/components/seo/JsonLd";
 import Act from "@/components/spatial/Act";
 import Door from "@/components/spatial/Door";
 import Threshold from "@/components/spatial/Threshold";
+import Witness from "@/components/spatial/Witness";
 import Ch01Arrival from "@/components/sections/Ch01Arrival";
 import Ch02Philosophy from "@/components/sections/Ch02Philosophy";
 import Ch03SecondBrain from "@/components/sections/Ch03SecondBrain";
@@ -49,6 +50,7 @@ export default function Home() {
       <Atmosphere />
       <Door />
       <Threshold />
+      <Witness />
       {ACTS.map((act) => (
         <Act key={act.id} act={act}>
           {CHAPTERS_BY_ACT[act.id as keyof typeof CHAPTERS_BY_ACT]}
